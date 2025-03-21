@@ -12,3 +12,4 @@ type Reservation struct {
 func NewReservation(customerName, roomType, startDate, endDate string, price float32) *Reservation {
 	return &Reservation{CustomerName: customerName, RoomType: roomType, StartDate: startDate, EndDate: endDate, Price: price}
 }
+  
