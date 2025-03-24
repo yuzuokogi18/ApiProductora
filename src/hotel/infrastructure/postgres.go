@@ -27,7 +27,6 @@ func (repo *HotelPgRepository) Save(hotel *domain.Hotel) error {
 
 // El método GetAll obtiene todos los hoteles de la base de datos
 func (repo *HotelPgRepository) GetAll() ([]domain.Hotel, error) {
-	// Realiza la consulta para obtener todos los hoteles
 	query := "SELECT id, name, location, stars, price FROM hotels"
 	rows, err := repo.db.Query(query)
 	if err != nil {
@@ -38,7 +37,6 @@ func (repo *HotelPgRepository) GetAll() ([]domain.Hotel, error) {
 	var hotels []domain.Hotel
 	for rows.Next() {
 		var hotel domain.Hotel
-		// Escanea cada fila y llena el modelo de datos
 		if err := rows.Scan(&hotel.Id, &hotel.Name, &hotel.Location, &hotel.Stars, &hotel.Price); err != nil {
 			return nil, fmt.Errorf("Error al escanear los datos: %v", err)
 		}
@@ -50,4 +48,20 @@ func (repo *HotelPgRepository) GetAll() ([]domain.Hotel, error) {
 	}
 
 	return hotels, nil
+}
+
+// El método GetById obtiene un hotel por su ID
+func (repo *HotelPgRepository) GetById(id int) (*domain.Hotel, error) {
+	query := "SELECT id, name, location, stars, price FROM hotels WHERE id = $1"
+	row := repo.db.QueryRow(query, id)
+
+	var hotel domain.Hotel
+	if err := row.Scan(&hotel.Id, &hotel.Name, &hotel.Location, &hotel.Stars, &hotel.Price); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("No se encontró el hotel con ID %d", id)
+		}
+		return nil, fmt.Errorf("Error al obtener el hotel: %v", err)
+	}
+
+	return &hotel, nil
 }
